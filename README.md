@@ -5,14 +5,14 @@
 ### SQL-ADV
 Number and name of feature | Estimate of time needed to complete | Start time | Finish time | Actual time
 ---------------------------|-------------------------------------|------------|-------------|------------
-Feature #1: Movies | ? | ? | ? | ?
+Feature #1: Movies | 1h | 10pm | 11:30pm | 1h and 30min
 Feature #2: Yelp  | ? | ? | ? | ?
 Feature #3: Refactor | ? | ? | ? | ?
 
 # Project Name
 
 **Author**: Ahmed Abu Samaan
-**Version**: 1.0.0 (increment the patch/fix version number if you make more commits past your first submission)
+**Version**: 2.0.0 (increment the patch/fix version number if you make more commits past your first submission)
 
 ## Overview
 convert a location entered by the user into a latitude and longitude, then use those values to request weather information for that location
