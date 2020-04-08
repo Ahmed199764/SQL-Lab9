@@ -7,12 +7,12 @@ Number and name of feature | Estimate of time needed to complete | Start time | 
 ---------------------------|-------------------------------------|------------|-------------|------------
 Feature #1: Movies | 1h | 10pm | 11:30pm | 1h and 30min
 Feature #2: Yelp  | 1h | 11:35min | 00:00 | 25min
-Feature #3: Refactor | ? | ? | ? | ?
+Feature #3: Refactor | 1h | 00:00 | still | still
 
 # Project Name
 
 **Author**: Ahmed Abu Samaan
-**Version**: 3.0.0 (increment the patch/fix version number if you make more commits past your first submission)
+**Version**: 4.0.0 (increment the patch/fix version number if you make more commits past your first submission)
 
 ## Overview
 convert a location entered by the user into a latitude and longitude, then use those values to request weather information for that location
@@ -28,9 +28,7 @@ dependencies such as cors , dotenv and express and pg.
 1. 04-07-2020 5:00pm - Application now has a ready files to start working
 2. 04-07-2020 11:30pm - Applocation now has a ready movie function
 3. 04-07-2020 00:00 - Application now has a ready yelp function
-4. 
-
-
+4. 04-07-20202 1:30am - still working on this feature
 
 ## Credits and Collaborations
 https://github.com/AbdallahAlkhatatbeh

@@ -1,20 +1,19 @@
 'use strict';
 
-require('dotenv').config();
-
 const express = require('express');
 const cors = require('cors');
 const superagent = require('superagent');
-const pg = require('pg');
+const handler = require('./handler.js');
+const client = require('./client.js');
+const locationHandler = require('./location.js');
+const weatherHandler = require('./weather.js');
+const trailHandler = require('./trail.js');
+const yelpHandler = require('./yelp.js');
+const movieHandler = require('./movie.js');
 
 const PORT = process.env.PORT || 4000;
 const app = express();
-const client = new pg.Client(process.env.DATABASE_URL);
 app.use(cors());
-
-client.on('error', err => {
-    throw new Error(err);
-});
 
 app.get('/add', (request, response) => {
     let search_query = request.query.search_query;
@@ -54,14 +53,6 @@ client.connect().then(() => {
     throw new Error(`startup error ${err}`);
 });
 
-app.get('/location', locationHandler);
-app.get('/weather', weatherHandler);
-app.get('/trails', trailHandler);
-app.get('/movie', getMovies);
-app.get('/yelp', getYelp);
-app.use('*', notFoundHandler);
-app.use(errorHandler);
-
 function locationHandler(request, response) {
     const city = request.query.city;
     superagent(
@@ -75,61 +66,6 @@ function locationHandler(request, response) {
         .catch((err) => errorHandler(err, request, response));
 }
 
-
-function weatherHandler(request, response) {
-    superagent(
-        `https://api.weatherbit.io/v2.0/forecast/daily?city=${request.query.search_query}&key=${process.env.WEATHER_API_KEY}`
-    )
-        .then((weatherRes) => {
-            console.log(weatherRes);
-            const weatherSummaries = weatherRes.body.data.map((day) => {
-                return new Weather(day);
-            });
-            response.status(200).json(weatherSummaries);
-        })
-        .catch((err) => errorHandler(err, request, response));
-}
-
-function trailHandler(request, response) {
-    const city1 = request.query.city1;
-    superagent(
-        `https://www.hikingproject.com/data/get-trails?key=${process.env.GEOCODE_API_KEY}&key=${process.env.TRAIL_API_KEY}&q=${city1}&format=json`
-    )
-        .then((trailRes) => {
-            const trailData = trailRes.body;
-            const locationData = new Trails(city1, trailData);
-            response.status(200).json(locationData);
-        })
-        .catch((err) => errorHandler(err, request, response));
-}
-
-function getMovies(request, response) {
-    const values = request.query.values;
-    superagent(
-        `https://api.themoviedb.org/3/search/movie?api_key=${process.env.MOVIE_API_KEY}&query=${request.query.search_query}`
-    )
-        .then((trailRes1) => {
-            const movieData = trailRes1.body;
-            const locationData = new Movie(values, movieData);
-            response.status(200).json(locationData);
-        })
-        .catch((err) => errorHandler(err, request, response));
-}
-
-function getYelp(request, response) {
-    const values1 = request.query.values1;
-    superagent(
-        `https://api.yelp.com/v3/businesses/search?location=${request.query.search_query}`
-    )
-        .then((yelplRes1) => {
-            const yelpeData = yelplRes1.body;
-            const locationData = new Movie(values1, yelpeData);
-            response.status(200).json(locationData);
-        })
-        .catch((err) => errorHandler(err, request, response));
-}
-
-
 function Location(city, geoData) {
     this.search_query = city;
     this.formatted_query = geoData[0].display_name;
@@ -137,49 +73,12 @@ function Location(city, geoData) {
     this.longitude = geoData[0].lon;
 }
 
-function Weather(day) {
-    this.forecast = day.weather.description;
-    this.time = new Date(day.valid_date).toString().slice(0, 15);
-}
-
-function Trails(city1, trailData) {
-    this.search_query = city1;
-    this.name = trailData.name;
-    this.location = trailData.location;
-    this.length = trailData.length;
-    this.stars = trailData.stars;
-    this.star_votes = trailData.starVotes;
-    this.summary = trailData.summary;
-    this.trail_url = trailData.url;
-    this.conditions = trailData.conditionStatus;
-    this.condition_date = trailData.conditionDate;
-    this.condition_time = trailData.conditionDate;
-}
-
-function Movie(movie) {
-    this.title = movie.title;
-    this.released_on = movie.release_date;
-    this.total_votes = movie.vote_count;
-    this.avarage_votes = movie.vote_average;
-    this.popularity = movie.popularity;
-    this.image_url = `https://image.tmdb.org/t/p/original${movie.backdrop_path}`;
-    this.overview = movie.overview;
-}
-
-function Yelp(yelp) {
-    this.url = yelp.url;
-    this.name = yelp.name;
-    this.rating = yelp.rating;
-    this.price = yelp.price;
-    this.image_url = yelp.image_url;
-}
-
-function notFoundHandler(request, response) {
-    response.status(404).send('huh?');
-}
-
-function errorHandler(error, request, response) {
-    response.status(500).send(error);
-}
+app.get('/location', locationHandler);
+app.get('/weather', weatherHandler);
+app.get('/trails', trailHandler);
+app.get('/movie', movieHandler);
+app.get('/yelp', yelpHandler);
+app.use('*', handler.notFoundHandler);
+app.use(handler.errorHandler);
 
 app.listen(PORT, () => console.log(`App is listening on ${PORT}`));
